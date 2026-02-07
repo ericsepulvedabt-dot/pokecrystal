@@ -1948,15 +1948,18 @@ Music_VolumeEnvelope:
 	ret
 
 Music_Tempo:
-; global tempo
-; params: 2
-;	de: tempo
-	call GetMusicByte
-	ld d, a
-	call GetMusicByte
-	ld e, a
-	call SetGlobalTempo
-	ret
+    call GetMusicByte
+    ld d, a
+    call GetMusicByte
+    ld e, a
+    ; make tempo 4x slower (tempo * 4)
+    sla e
+    rl d
+    sla e
+    rl d
+    call SetGlobalTempo
+    ret
+
 
 Music_Octave8:
 Music_Octave7:
