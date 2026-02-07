@@ -1,0 +1,35 @@
+name: Build pokecrystal
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make gcc git rgbds
+
+      - name: Reconstruct baserom
+        env:
+          BASEROM_GBC_B64: ${{ secrets.BASEROM_GBC_B64 }}
+        run: |
+          if [ -z "${BASEROM_GBC_B64}" ]; then
+            echo "BASEROM_GBC_B64 secret is not set."
+            exit 1
+          fi
+          echo "${BASEROM_GBC_B64}" | base64 -d > baserom.gbc
+
+      - name: Build
+        run: make -j
+
+      - name: Upload pokecrystal.gbc
+        uses: actions/upload-artifact@v4
+        with:
+          name: pokecrystal-gbc
+          path: pokecrystal.gbc
